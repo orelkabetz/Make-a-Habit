@@ -13,41 +13,59 @@ struct HabitRowView: View {
     let viewModel: HabitViewModel
     @State private var showCelebration = false
     @State private var celebrationMessage = ""
+    @State private var showDetailView = false
     
     private let logoGreen = Color(red: 0.298, green: 0.686, blue: 0.314) // #4CAF50
     private let lightGreen = Color.gray.opacity(0.1) // Grayish background before completion
     private let darkerGreen = Color(red: 0.298, green: 0.686, blue: 0.314, opacity: 0.4) // More gradient when completed
     
     var body: some View {
-        Button(action: {
-            viewModel.markHabitComplete(habit)
-            checkForCelebration()
-        }) {
-            HStack(spacing: 16) {
-                // Habit name
-                Text(habit.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                // Green circle with streak number
-                ZStack {
-                    Circle()
-                        .fill(logoGreen)
-                        .frame(width: 50, height: 50)
+        HStack(spacing: 0) {
+            // Main card (tap to complete)
+            Button(action: {
+                viewModel.markHabitComplete(habit)
+                checkForCelebration()
+            }) {
+                HStack(spacing: 16) {
+                    // Habit name
+                    Text(habit.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
                     
-                    Text("\(viewModel.getCurrentStreak(for: habit))")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
+                    Spacer()
+                    
+                    // Green circle with streak number
+                    ZStack {
+                        Circle()
+                            .fill(logoGreen)
+                            .frame(width: 50, height: 50)
+                        
+                        Text("\(viewModel.getCurrentStreak(for: habit))")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                    }
                 }
+                .padding()
+                .background(isCompletedToday ? darkerGreen : lightGreen)
+                .cornerRadius(12)
             }
-            .padding()
-            .background(isCompletedToday ? darkerGreen : lightGreen)
-            .cornerRadius(12)
+            .buttonStyle(.plain)
+            
+            // Info button to show calendar
+            Button(action: {
+                showDetailView = true
+            }) {
+                Image(systemName: "info.circle")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 12)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .sheet(isPresented: $showDetailView) {
+            HabitDetailView(habit: habit, viewModel: viewModel)
+        }
         .alert("🎉 Congratulations!", isPresented: $showCelebration) {
             Button("OK", role: .cancel) { }
         } message: {

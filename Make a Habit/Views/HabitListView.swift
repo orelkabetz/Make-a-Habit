@@ -13,6 +13,7 @@ struct HabitListView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = HabitViewModel()
     @State private var showAddHabit = false
+    @State private var showCalendar = false
     @State private var quoteRefreshTrigger = UUID()
     
     var body: some View {
@@ -32,7 +33,13 @@ struct HabitListView: View {
                 }
             }
             
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showCalendar = true
+                }) {
+                    Image(systemName: "calendar")
+                }
+                
                 Button(action: {
                     showAddHabit = true
                 }) {
@@ -43,6 +50,9 @@ struct HabitListView: View {
         .sheet(isPresented: $showAddHabit) {
             AddHabitView()
         }
+        .sheet(isPresented: $showCalendar) {
+            UnifiedCalendarView()
+        }
         .onAppear {
             viewModel.setModelContext(modelContext)
             NotificationManager.shared.requestAuthorization()
@@ -50,7 +60,8 @@ struct HabitListView: View {
     }
     
     private var habitListView: some View {
-        GeometryReader { geometry in
+        VStack(spacing: 0) {
+            // Scrollable list of habits
             List {
                 // Instruction text above cards
                 Text("Press if you made it today")
@@ -77,17 +88,14 @@ struct HabitListView: View {
                 }
             }
             .listStyle(.plain)
-            .contentMargins(.bottom, 220, for: .scrollContent) // Reserve space for quote card
-            .safeAreaInset(edge: .bottom) {
-                // Inspiring quote card at the very bottom
-                QuoteCardView(refreshTrigger: quoteRefreshTrigger)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
-            }
+            .scrollContentBackground(.hidden)
             .refreshable {
                 // Force quote to change on pull-to-refresh
                 quoteRefreshTrigger = UUID()
             }
+            
+            // Fixed quote card at the bottom (outside scrollable area)
+            QuoteCardContainer(refreshTrigger: quoteRefreshTrigger)
         }
     }
     
