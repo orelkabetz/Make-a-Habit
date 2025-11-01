@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showWelcomeBack = true
+    @State private var showOnboarding = true
     
     var body: some View {
         Group {
-            if showWelcomeBack {
-                WelcomeBackView(showWelcomeBack: $showWelcomeBack)
+            if showOnboarding {
+                // Show onboarding every time app opens
+                OnboardingView(showOnboarding: $showOnboarding)
             } else {
                 NavigationStack {
                     HabitListView()
@@ -21,8 +22,8 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            // Show welcome back every time app opens
-            showWelcomeBack = true
+            // Show onboarding every time app opens
+            showOnboarding = true
         }
     }
 }

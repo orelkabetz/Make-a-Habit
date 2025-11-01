@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct MakeAHabitApp: App {
+    @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Habit.self,
@@ -35,6 +37,7 @@ struct MakeAHabitApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(appearanceMode == "light" ? .light : appearanceMode == "dark" ? .dark : nil)
         }
         .modelContainer(sharedModelContainer)
     }

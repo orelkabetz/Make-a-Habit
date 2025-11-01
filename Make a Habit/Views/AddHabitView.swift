@@ -42,31 +42,39 @@ struct AddHabitView: View {
                         DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
                         
                         if period == .daily || period == .weekly {
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 12) {
                                 Text("Days of Week")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                                 
-                                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+                                HStack(spacing: 8) {
                                     ForEach(0..<7, id: \.self) { dayIndex in
                                         let dayName = Calendar.current.shortWeekdaySymbols[dayIndex]
+                                        let isSelected = selectedDays.contains(dayIndex)
+                                        
                                         Button(action: {
-                                            if selectedDays.contains(dayIndex) {
-                                                selectedDays.remove(dayIndex)
-                                            } else {
-                                                selectedDays.insert(dayIndex)
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                if selectedDays.contains(dayIndex) {
+                                                    selectedDays.remove(dayIndex)
+                                                } else {
+                                                    selectedDays.insert(dayIndex)
+                                                }
                                             }
                                         }) {
                                             Text(dayName)
                                                 .font(.caption)
-                                                .frame(width: 40, height: 40)
-                                                .background(selectedDays.contains(dayIndex) ? Color.blue : Color.gray.opacity(0.2))
-                                                .foregroundColor(selectedDays.contains(dayIndex) ? .white : .primary)
+                                                .fontWeight(isSelected ? .semibold : .regular)
+                                                .frame(maxWidth: .infinity)
+                                                .frame(height: 44)
+                                                .background(isSelected ? Color.blue : Color.gray.opacity(0.2))
+                                                .foregroundColor(isSelected ? .white : .primary)
                                                 .cornerRadius(8)
                                         }
+                                        .buttonStyle(.plain)
                                     }
                                 }
                             }
+                            .padding(.vertical, 8)
                         }
                     }
                 }

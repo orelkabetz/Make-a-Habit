@@ -14,6 +14,7 @@ struct HabitListView: View {
     @StateObject private var viewModel = HabitViewModel()
     @State private var showAddHabit = false
     @State private var showCalendar = false
+    @State private var showSettings = false
     @State private var quoteRefreshTrigger = UUID()
     
     var body: some View {
@@ -35,6 +36,12 @@ struct HabitListView: View {
             
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: {
+                    showSettings = true
+                }) {
+                    Image(systemName: "gearshape")
+                }
+                
+                Button(action: {
                     showCalendar = true
                 }) {
                     Image(systemName: "calendar")
@@ -52,6 +59,9 @@ struct HabitListView: View {
         }
         .sheet(isPresented: $showCalendar) {
             UnifiedCalendarView()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
         .onAppear {
             viewModel.setModelContext(modelContext)
